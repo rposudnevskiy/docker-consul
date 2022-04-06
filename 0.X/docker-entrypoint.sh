@@ -111,4 +111,10 @@ if [ "$1" = 'consul' -a -z "${CONSUL_DISABLE_PERM_MGMT+x}" ]; then
   set -- su-exec ${CONSUL_UID}:${CONSUL_GID} "$@"
 fi
 
+# Check availability of dbus system socket and publish DNS-SD service
+if [ -S /var/run/dbus/system_bus_socket ]; then
+    echo "Publish DNS-SD consul-server service"
+    avahi-publish -s -v `hostname`-consul-server _consul_server._tcp 8300 &
+fi
+
 exec "$@"
